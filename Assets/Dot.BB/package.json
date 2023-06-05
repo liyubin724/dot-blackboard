@@ -1,0 +1,16 @@
+{
+    "name": "com.dot.bb",
+    "version": "0.0.1",
+    "displayName": "Dot BlackBoard",
+    "description": "Dot BlackBoard",
+    "unity": "2022.3",
+    "dependencies": {
+    },
+    "keywords": [
+    ],
+    "author": {
+        "name": "liyubin",
+        "email": "liyubin724@163.com",
+        "url": "https://www.liyubin.com"
+    }
+}
