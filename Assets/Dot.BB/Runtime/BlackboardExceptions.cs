@@ -23,4 +23,22 @@ namespace DotEngine.BB
 
         }
     }
+
+    public class BlackboardValueNotCastException : BlackboardException
+    {
+        public BlackboardValueNotCastException(object key, Type targetType, object value)
+            : base($"The value({value.GetType().Name}) of key(${key}) cant be casted to ${targetType.Name}")
+        {
+
+        }
+    }
+
+    public class BlackboardInvokeEndlessLoopException : BlackboardException
+    {
+        public BlackboardInvokeEndlessLoopException(object key)
+            : base($"Listener({key}) was called in circular dependencies")
+        {
+
+        }
+    }
 }

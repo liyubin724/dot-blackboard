@@ -1,21 +1,17 @@
 ﻿namespace DotEngine.BB
 {
-    public enum EBlackboardAction
-    {
-        Add = 0,
-        Remove,
-        Update,
-    }
-
-    public delegate void BlackboardChanged<TKey>(
+    public delegate void BlackboardValueChanged<TKey>(
         IBlackboard<TKey> blackboard,
-        EBlackboardAction action,
         TKey key,
         object oldValue,
         object newValue);
 
     public interface IBlackboard<TKey>
     {
+        event BlackboardValueChanged<TKey> onValueAdded;
+        event BlackboardValueChanged<TKey> onValueUpdated;
+        event BlackboardValueChanged<TKey> onValueRemoved;
+
         TKey[] keys { get; }
 
         bool ContainsKey(TKey key);
@@ -28,13 +24,9 @@
 
         void AddValue(TKey key, object value);
         bool UpdateValue(TKey key, object newValue);
+        void AddOrUpdateValue(TKey key, object value);
         bool RemoveValue(TKey key);
 
         void Clear();
-
-        void RegisterListener(TKey key, BlackboardChanged<TKey> listener);
-        void UnregisterListener(TKey key, BlackboardChanged<TKey> listener);
-        void UnregisterAllListener(TKey key);
-        void UnregisterAllListner();
     }
 }
