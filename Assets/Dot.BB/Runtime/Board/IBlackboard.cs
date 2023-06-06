@@ -1,5 +1,17 @@
-﻿namespace DotEngine.BB
+﻿using System;
+
+namespace DotEngine.BB
 {
+    [Flags]
+    public enum BlackboardAction
+    {
+        Add = 1 << 0,
+        Update = 1 << 1,
+        Remove = 1 << 2,
+
+        All = Add | Update | Remove,
+    }
+
     public delegate void BlackboardValueChanged<TKey>(
         IBlackboard<TKey> blackboard,
         TKey key,
