@@ -9,18 +9,18 @@ namespace DotEngine.BB
         public event BlackboardValueChanged<TKey> onValueUpdated;
         public event BlackboardValueChanged<TKey> onValueRemoved;
 
-        private Dictionary<TKey, object> m_ItemDic = null;
+        protected Dictionary<TKey, object> itemDic = null;
 
-        private TKey[] m_CachedKeys = null;
+        protected TKey[] cachedKeys = null;
         public TKey[] keys
         {
             get
             {
-                if (m_CachedKeys == null)
+                if (cachedKeys == null)
                 {
-                    m_CachedKeys = m_ItemDic.Keys.ToArray();
+                    cachedKeys = itemDic.Keys.ToArray();
                 }
-                return m_CachedKeys;
+                return cachedKeys;
             }
         }
 
@@ -31,17 +31,17 @@ namespace DotEngine.BB
 
         public Blackboard(IEqualityComparer<TKey> comparer)
         {
-            m_ItemDic = new Dictionary<TKey, object>(comparer);
+            itemDic = new Dictionary<TKey, object>(comparer);
         }
 
-        public bool ContainsKey(TKey key)
+        public virtual bool ContainsKey(TKey key)
         {
-            return m_ItemDic.ContainsKey(key);
+            return itemDic.ContainsKey(key);
         }
 
-        public object GetValue(TKey key)
+        public virtual object GetValue(TKey key)
         {
-            if (!m_ItemDic.TryGetValue(key, out object value))
+            if (!TryGetValue(key, out object value))
             {
                 throw new BlackboardKeyNotFoundException(key);
             }
@@ -49,11 +49,16 @@ namespace DotEngine.BB
             return value;
         }
 
-        public TValue GetValue<TValue>(TKey key)
+        public virtual TValue GetValue<TValue>(TKey key)
         {
-            if (!m_ItemDic.TryGetValue(key, out object value) || value == null)
+            if (!TryGetValue(key, out object value))
             {
                 throw new BlackboardKeyNotFoundException(key);
+            }
+
+            if (value == null)
+            {
+                return default(TValue);
             }
 
             if (value is TValue result)
@@ -64,9 +69,9 @@ namespace DotEngine.BB
             throw new BlackboardValueNotCastException(key, typeof(TValue), value);
         }
 
-        public bool TryGetValue(TKey key, out object value)
+        public virtual bool TryGetValue(TKey key, out object value)
         {
-            if (m_ItemDic.TryGetValue(key, out value))
+            if (itemDic.TryGetValue(key, out value))
             {
                 return true;
             }
@@ -75,14 +80,20 @@ namespace DotEngine.BB
             return false;
         }
 
-        public bool TryGetValue<TValue>(TKey key, out TValue value)
+        public virtual bool TryGetValue<TValue>(TKey key, out TValue value)
         {
-            if (!m_ItemDic.TryGetValue(key, out var item) || item == null)
+            if (!TryGetValue(key, out var item))
             {
                 value = default(TValue);
                 return false;
-
             }
+
+            if (item == null)
+            {
+                value = default(TValue);
+                return true;
+            }
+
             if (item is TValue result)
             {
                 value = result;
@@ -93,80 +104,81 @@ namespace DotEngine.BB
             return false;
         }
 
-        public void AddValue(TKey key, object value)
+        public virtual void AddValue(TKey key, object value)
         {
-            if (m_ItemDic.ContainsKey(key))
+            if (ContainsKey(key))
             {
                 throw new BlackboardKeyRepeatedException(key);
             }
 
-            m_CachedKeys = null;
-            m_ItemDic.Add(key, value);
+            cachedKeys = null;
+            itemDic.Add(key, value);
 
             onValueAdded?.Invoke(this, key, null, value);
         }
 
-        public bool UpdateValue(TKey key, object value)
+        public virtual void UpdateValue(TKey key, object value)
         {
-            if (!ContainsKey(key))
+            if (!TryGetValue(key, out var oldValue))
             {
-                return false;
+                throw new BlackboardKeyNotFoundException(key);
             }
 
-            var oldValue = m_ItemDic[key];
-            if (oldValue != value)
-            {
-                m_ItemDic[key] = value;
+            itemDic[key] = value;
 
-                onValueUpdated?.Invoke(this, key, oldValue, value);
-
-                return true;
-            }
-
-            return false;
+            onValueUpdated?.Invoke(this, key, oldValue, value);
         }
 
-        public void AddOrUpdateValue(TKey key, object value)
+        public virtual void AddOrUpdateValue(TKey key, object value)
         {
             if (!ContainsKey(key))
             {
-                m_CachedKeys = null;
-                m_ItemDic.Add(key, value);
+                cachedKeys = null;
+                itemDic.Add(key, value);
 
                 onValueAdded?.Invoke(this, key, null, value);
             }
             else
             {
-                var oldValue = m_ItemDic[key];
-                if (oldValue != value)
-                {
-                    m_ItemDic[key] = value;
+                var oldValue = GetValue(key);
+                itemDic[key] = value;
 
-                    onValueUpdated?.Invoke(this, key, oldValue, value);
-                }
+                onValueUpdated?.Invoke(this, key, oldValue, value);
             }
         }
 
-        public bool RemoveValue(TKey key)
+        public virtual void RemoveValue(TKey key)
         {
-            if (!ContainsKey(key))
+            if (!TryGetValue(key, out var oldValue))
+            {
+                throw new BlackboardKeyNotFoundException(key);
+            }
+
+            cachedKeys = null;
+            itemDic.Remove(key);
+
+            onValueRemoved?.Invoke(this, key, oldValue, null);
+        }
+
+        public virtual bool TryRemoveValue(TKey key)
+        {
+            if (!TryGetValue(key, out var oldValue))
             {
                 return false;
             }
 
-            m_CachedKeys = null;
-            var oldValue = m_ItemDic[key];
-            m_ItemDic.Remove(key);
+            cachedKeys = null;
+            itemDic.Remove(key);
 
             onValueRemoved?.Invoke(this, key, oldValue, null);
 
             return true;
         }
 
-        public void Clear()
+        public virtual void Clear()
         {
-            m_CachedKeys = null;
-            m_ItemDic.Clear();
+            cachedKeys = null;
+            itemDic.Clear();
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿namespace DotEngine.BB
+﻿namespace DotEngine.BB.Collector
 {
     public interface IBlackboardCollector<TKey>
     {

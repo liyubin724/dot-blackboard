@@ -19,9 +19,9 @@ namespace DotEngine.BB
             AddValue(typeof(TValue), value);
         }
 
-        public bool UpdateValue<TValue>(TValue value)
+        public void UpdateValue<TValue>(TValue value)
         {
-            return UpdateValue(typeof(TValue), value);
+            UpdateValue(typeof(TValue), value);
         }
 
         public void AddOrUpdateValue<TValue>(TValue value)
@@ -29,9 +29,14 @@ namespace DotEngine.BB
             AddOrUpdateValue(typeof(TValue), value);
         }
 
-        public bool RemoveValue<TValue>()
+        public void RemoveValue<TValue>()
         {
-            return RemoveValue(typeof(TValue));
+            RemoveValue(typeof(TValue));
+        }
+
+        public bool TryRemoveValue<TValue>()
+        {
+            return TryRemoveValue(typeof(TValue));
         }
     }
 }

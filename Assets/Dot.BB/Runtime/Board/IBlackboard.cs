@@ -35,9 +35,10 @@ namespace DotEngine.BB
         bool TryGetValue<TValue>(TKey key, out TValue value);
 
         void AddValue(TKey key, object value);
-        bool UpdateValue(TKey key, object newValue);
+        void UpdateValue(TKey key, object newValue);
         void AddOrUpdateValue(TKey key, object value);
-        bool RemoveValue(TKey key);
+        void RemoveValue(TKey key);
+        bool TryRemoveValue(TKey key);
 
         void Clear();
     }

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace DotEngine.BB
+namespace DotEngine.BB.Watcher
 {
     public class BlackboardWatcher<TKey> : IBlackboardWatcher<TKey>
     {

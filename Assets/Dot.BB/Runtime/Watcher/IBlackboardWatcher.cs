@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace DotEngine.BB
+namespace DotEngine.BB.Watcher
 {
     public delegate void BlackboardCollectorChanged<TKey>(
         IBlackboardWatcher<TKey> collector,

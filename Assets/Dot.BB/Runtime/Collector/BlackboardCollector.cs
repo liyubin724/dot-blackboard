@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace DotEngine.BB
+namespace DotEngine.BB.Collector
 {
     public class BlackboardCollector<TKey> : IBlackboardCollector<TKey>
     {
